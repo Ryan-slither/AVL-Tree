@@ -37,27 +37,33 @@ TEST_CASE("Incorrect Commands", "[flag]") {
     streambuf *cinBuff = cin.rdbuf();
     cin.rdbuf(testInput.rdbuf());
 
-    AVL tree(nullptr);
     int commands;
+    string line;
+    AVL tree(nullptr);
     // Check number of commands
-    cin >> commands;
+    getline(cin, line);
+    commands = stoi(line);
     // Loop to process inputs
     for (int i = 0; i < commands; ++i) {
         bool success = true;
+        line.clear();
         string command;
         string studentName;
         string searchInput;
         string studentId;
         string nodeNumber;
-        cin >> command;
-        // Logic chain to determine input decisions and run methods
+        getline(cin, line);
+        stringstream ss(line);
+        ss >> command;
         if (command == "insert") {
-            cin >> studentName >> studentId;
-            if (studentId.size() != 8 || !checkCharacters(studentName) || !checkNumbers(studentId)) {
+            getline(ss, studentName, '"');
+            getline(ss, studentName, '"');
+            getline(ss ,studentId, ' ');
+            getline(ss ,studentId, ' ');
+            if (studentId.size() != 8 || checkCharacters(studentName) || checkNumbers(studentId)) {
                 cout << "unsuccessful" << endl;
                 continue;
             }
-            studentName = studentName.substr(1, studentName.size() - 2);
             if (tree.root == nullptr) {
                 tree.root = tree.insert(tree.root, stoi(studentId), studentName, success);
             } else {
@@ -67,15 +73,17 @@ TEST_CASE("Incorrect Commands", "[flag]") {
                 cout << "successful" << endl;
             }
         } else if (command == "remove") {
-            cin >> studentId;
+            getline(ss ,studentId, ' ');
+            getline(ss ,studentId, ' ');
             if (studentId.size() != 8 && checkNumbers(studentId)) {
                 cout << "unsuccessful" << endl;
                 continue;
             }
             tree.removeId(tree.root, stoi(studentId));
         } else if (command == "search") {
-            cin >> searchInput;
-            if (checkNumbers(searchInput)) {
+            getline(ss ,searchInput, ' ');
+            getline(ss ,searchInput, ' ');
+            if (!checkNumbers(searchInput)) {
                 if (searchInput.size() != 8) {
                     cout << "unsuccessful" << endl;
                     continue;
@@ -85,6 +93,7 @@ TEST_CASE("Incorrect Commands", "[flag]") {
                     cout << result->name << endl;
                 }
             } else {
+                searchInput = searchInput.substr(1, searchInput.size() - 2);
                 if (checkCharacters(searchInput)) {
                     cout << "unsuccessful" << endl;
                     continue;
@@ -100,11 +109,10 @@ TEST_CASE("Incorrect Commands", "[flag]") {
         } else if (command == "printLevelCount") {
             tree.printLevelCount();
         } else if (command == "removeInorder") {
-            cin >> nodeNumber;
-            if (checkNumbers(nodeNumber) && stoi(nodeNumber) > -1) {
+            getline(ss ,nodeNumber, ' ');
+            getline(ss ,nodeNumber, ' ');
+            if (!checkNumbers(nodeNumber) && stoi(nodeNumber) > -1) {
                 tree.removeInorderN(stoi(nodeNumber));
-            } else {
-                cout << "unsuccessful" << endl;
             }
         } else {
             cout << "unsuccessful" << endl;
